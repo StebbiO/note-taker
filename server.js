@@ -14,14 +14,13 @@ app.get('/notes', (req, res) => {
     res.sendFile(path.join(__dirname, '/public/notes.html'));
 });
 
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '/public/index.html'));
-});
-
 app.get('/api/notes', (req, res) => {
     res.json(notes);
 });
 
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '/public/index.html'));
+});
 
 app.post('/api/notes', (req, res) => {
     let jsonFile = path.join(__dirname, 'db/db.json');
@@ -36,6 +35,24 @@ app.post('/api/notes', (req, res) => {
         }
     });
     res.json(newNote);
+});
+
+app.delete('api/notes/:id', (req, res) => {
+    let jsonFile = path.join(__dirname, 'db/db.json');
+
+    for (let i = 0; i < notes.length; i++) {
+        if (notes[i].id === req.params.id) {
+            notes.splice(i, 1);
+            break;
+        }
+    }
+
+    fs.writeFile(jsonFile, JSON.stringify(notes), (err) => {
+        if (err) {
+            throw err;
+        }
+    });
+    res.json(notes);
 });
 
 app.listen(PORT, () => {
